@@ -36,18 +36,16 @@ export class ComparisonFactory extends BaseFactory {
     const filesOfSecondSubmission = store().filesOfSubmission(secondSubmissionId)
 
     const matches = json.matches as Array<Record<string, unknown>>
-    matches.forEach((match) => {
-      store().getSubmissionFile(
-        firstSubmissionId,
-        slash(match.file1 as string)
-      ).matchedTokenCount += match.tokens as number
-      store().getSubmissionFile(
-        secondSubmissionId,
-        slash(match.file2 as string)
-      ).matchedTokenCount += match.tokens as number
-    })
+    const unColoredMatches = matches.map((match) =>
+      this.getMatch(firstSubmissionId, secondSubmissionId, match)
+    )
 
-    const unColoredMatches = matches.map((match) => this.getMatch(match))
+    unColoredMatches.forEach((match) => {
+      store().getSubmissionFile(firstSubmissionId, slash(match.firstFile)).matchedTokenCount +=
+        match.tokens as number
+      store().getSubmissionFile(secondSubmissionId, slash(match.secondFile)).matchedTokenCount +=
+        match.tokens as number
+    })
 
     return new Comparison(
       firstSubmissionId,
@@ -123,10 +121,21 @@ export class ComparisonFactory extends BaseFactory {
     return store().getSubmissionFile(submissionId, fileName).data
   }
 
-  private static getMatch(match: Record<string, unknown>): Match {
+  private static getMatch(
+    firstSubmissionId: string,
+    secondSubmissionId: string,
+    match: Record<string, unknown>
+  ): Match {
+    function getSubmissionFileName(submissionId: string, fileName: string) {
+      if (fileName.startsWith(submissionId)) {
+        return slash(fileName)
+      }
+      return slash(`${submissionId}/${fileName}`)
+    }
+
     return {
-      firstFile: slash(match.file1 as string),
-      secondFile: slash(match.file2 as string),
+      firstFile: getSubmissionFileName(firstSubmissionId, match.file1 as string),
+      secondFile: getSubmissionFileName(secondSubmissionId, match.file2 as string),
       startInFirst: match.start1 as number,
       endInFirst: match.end1 as number,
       startInSecond: match.start2 as number,
