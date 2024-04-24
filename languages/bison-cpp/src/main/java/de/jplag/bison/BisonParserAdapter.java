@@ -36,9 +36,9 @@ public class BisonParserAdapter  extends AbstractParser {
                 // create a buffer of tokens pulled from the lexer
                 CommonTokenStream tokenStream = new CommonTokenStream(lexer);
                 BisonParser parser = new BisonParser(tokenStream);
-                BisonParser.Input_Context inpt = parser.input_();
+                BisonParser.Input_Context input = parser.input_();
 
-                //ParseTreeWalker.DEFAULT.walk(new CPPTokenListener(this), translationUnit);
+                ParseTreeWalker.DEFAULT.walk(new BisonTokenListener(this), input);
 
             } catch (IOException e) {
                 throw new ParsingException(file, e);

@@ -18,7 +18,12 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TokenExtractionTest {
-    String simple_bison = "%start program\n" +
+    String simple_bison = "%{\n" +
+            "  #define _GNU_SOURCE\n" +
+            "  #include <stdio.h>\n" +
+            "  #include \"ptypes.h\"\n" +
+            "%}\n" +
+            "%start program\n" +
             "\n" +
             "%%\n" +
             "\n" +
