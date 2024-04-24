@@ -8,14 +8,14 @@ import de.jplag.cpp2.CPPParserAdapter;
 import de.jplag.cpp2.CPPTokenListener;
 import de.jplag.cpp2.grammar.CPP14Lexer;
 import de.jplag.cpp2.grammar.CPP14Parser;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.nio.file.Files;
 import java.util.ArrayDeque;
+import java.util.BitSet;
 import java.util.Deque;
 
 import static de.jplag.bison.BisonTokenType.*;
@@ -42,10 +42,34 @@ public class BisonTokenListener extends BisonParserBaseListener {
     }
 
     @Override public void enterBison_grammar(BisonParser.Bison_grammarContext ctx) {
-        addEnter(RULES_BEGIN,ctx.getStart());
+        addEnter(GRAMMAR_BEGIN,ctx.getStart());
     }
     @Override public void exitBison_grammar(BisonParser.Bison_grammarContext ctx) {
+        addExit(GRAMMAR_END,ctx.getStop());
+    }
+
+    @Override public void enterRules(BisonParser.RulesContext ctx) {
+        addEnter(RULES_BEGIN,ctx.getStart());
+    }
+
+    @Override public void exitRules(BisonParser.RulesContext ctx) {
         addExit(RULES_END,ctx.getStop());
+    }
+
+    @Override public void enterRhs(BisonParser.RhsContext ctx) {
+        addEnter(RHS_BEGIN,ctx.getStart());
+    }
+
+    @Override public void exitRhs(BisonParser.RhsContext ctx) {
+        addExit(RHS_END,ctx.getStop());
+    }
+
+    @Override public void enterActionBlock(BisonParser.ActionBlockContext ctx) {
+        addEnter(ACTION_BLOCK_BEGIN,ctx.getStart());
+    }
+
+    @Override public void exitActionBlock(BisonParser.ActionBlockContext ctx) {
+        addExit(ACTION_BLOCK_END,ctx.getStop());
     }
 
     @Override public void enterEpilogue_opt(BisonParser.Epilogue_optContext ctx) {
@@ -67,8 +91,10 @@ public class BisonTokenListener extends BisonParserBaseListener {
                 doCppCode(code,node.getSymbol().getLine(),node.getSymbol().getCharPositionInLine() + 2);
                 addExitAfter(CODEBLOCK_END,node.getSymbol());
                 break;
+            case BisonLexer.BRACED_CODE:
             case BisonLexer.EPILOGUE:
                 doCppCode(node.getText(),node.getSymbol().getLine(),node.getSymbol().getCharPositionInLine());
+                break;
         }
     }
 
@@ -98,8 +124,15 @@ public class BisonTokenListener extends BisonParserBaseListener {
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         CPP14Parser parser = new CPP14Parser(tokenStream);
         CPP14Parser.TranslationUnitContext translationUnit = parser.translationUnit();
-
-        ParseTreeWalker.DEFAULT.walk(new CPPTokenListener(new AdjustedCPPParserAdapter(line,col,this.parser)), translationUnit);
+        if (parser.getNumberOfSyntaxErrors() == 0)
+            ParseTreeWalker.DEFAULT.walk(new CPPTokenListener(new AdjustedCPPParserAdapter(line,col,this.parser)), translationUnit);
+        else {
+            //reset parser and try to get a block
+            tokenStream.reset();
+            parser = new CPP14Parser(tokenStream);
+            CPP14Parser.CompoundStatementContext block = parser.compoundStatement();
+            ParseTreeWalker.DEFAULT.walk(new CPPTokenListener(new AdjustedCPPParserAdapter(line, col, this.parser)), block);
+        }
     }
 
     private void addEnter(TokenType type, Token token) {
