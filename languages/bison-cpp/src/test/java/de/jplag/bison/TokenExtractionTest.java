@@ -23,6 +23,10 @@ public class TokenExtractionTest {
             "  #include <stdio.h>\n" +
             "  #include \"ptypes.h\"\n" +
             "%}\n" +
+            "%{\n" +
+            "  static void print_token (yytoken_kind_t token, YYSTYPE val);\n" +
+            "%}\n" +
+            "\n" +
             "%start program\n" +
             "\n" +
             "%%\n" +

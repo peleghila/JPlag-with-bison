@@ -13,6 +13,11 @@
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
         </dependency>
+        <dependency>
+            <groupId>de.jplag</groupId>
+            <artifactId>cpp2</artifactId>
+            <version>4.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>
