@@ -74,7 +74,7 @@ public class TokenExtractionTest {
         de.jplag.text.ParserAdapter textParser = new de.jplag.text.ParserAdapter();
         BisonParserAdapter parser = new BisonParserAdapter();
 
-        File filePath = new File("D:\\hw-examples\\200408698-311489793\\parser.ypp");
+        File filePath = new File("parser.ypp");
         List<Token> textTokensForPositions = textParser.parse(Set.of(filePath));
         List<Token> tokens = parser.scan(Set.of(filePath));
 

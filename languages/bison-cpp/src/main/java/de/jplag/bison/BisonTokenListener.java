@@ -5,13 +5,13 @@ import de.jplag.TokenType;
 import de.jplag.bison.grammar.BisonLexer;
 import de.jplag.bison.grammar.BisonParser;
 import de.jplag.bison.grammar.BisonParserBaseListener;
-//import de.jplag.cpp2.CPPParserAdapter;
-//import de.jplag.cpp2.CPPTokenListener;
-//import de.jplag.cpp2.grammar.CPP14Lexer;
-//import de.jplag.cpp2.grammar.CPP14Parser;
-import de.jplag.cpp.CPPScanner;
-import de.jplag.cpp.CPPTokenType;
-import de.jplag.cpp.Scanner;
+import de.jplag.cpp2.CPPParserAdapter;
+import de.jplag.cpp2.CPPTokenListener;
+import de.jplag.cpp2.grammar.CPP14Lexer;
+import de.jplag.cpp2.grammar.CPP14Parser;
+//import de.jplag.cpp.CPPScanner;
+//import de.jplag.cpp.CPPTokenType;
+//import de.jplag.cpp.Scanner;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -163,39 +163,57 @@ public class BisonTokenListener extends BisonParserBaseListener {
 //                    length);
 //        }
 //    }
+    private class AdjustedTokenAdder implements CPP14Scanner.TokenAdder {
+            int firstLineOffset;
+            int firstLine;
 
-    class ScannerAdapter extends Scanner {
-        int firstLineOffset;
-        int firstLine;
-        ScannerAdapter(int firstLine,int firstLineOffset) {
+        AdjustedTokenAdder(int firstLine,int firstLineOffset) {
             this.firstLine = firstLine;
             this.firstLineOffset = firstLineOffset;
+
         }
+
         @Override
-        public void add(CPPTokenType type, de.jplag.cpp.Token token) {
-            int length = token.endColumn - token.beginColumn + 1;
-            int column = token.beginLine == 1 ? token.beginColumn + this.firstLineOffset : token.beginColumn;
-            int line =  token.beginLine + this.firstLine - 1;
-            parser.addToken(type,column,line,length);
+        public void addToken(TokenType type, int column, int line, int length) {
+            parser.addToken(type,
+                    line == 1 ? column + this.firstLineOffset : column,
+                    line + this.firstLine - 1,
+                    length);
         }
     }
+
+//    class ScannerAdapter extends Scanner {
+//        int firstLineOffset;
+//        int firstLine;
+//        ScannerAdapter(int firstLine,int firstLineOffset) {
+//            this.firstLine = firstLine;
+//            this.firstLineOffset = firstLineOffset;
+//        }
+//        @Override
+//        public void add(CPPTokenType type, de.jplag.cpp.Token token) {
+//            int length = token.endColumn - token.beginColumn + 1;
+//            int column = token.beginLine == 1 ? token.beginColumn + this.firstLineOffset : token.beginColumn;
+//            int line =  token.beginLine + this.firstLine - 1;
+//            parser.addToken(type,column,line,length);
+//        }
+//    }
 
     private void doCppCode(String cppCode,int line,int col) {
         //Bison preprocessing for $
         cppCode = cppCode.replace('$','q');
         //StringReader reader = new StringReader(cppCode);
 
-        try {
-            CPPScanner.scanIS(
-                new ByteArrayInputStream(cppCode.getBytes("UTF-8")),
-                new ScannerAdapter(line,col),
-                null
-            );
-        } catch (ParsingException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            CPPScanner.scanIS(
+//                new ByteArrayInputStream(cppCode.getBytes("UTF-8")),
+//                new ScannerAdapter(line,col),
+//                null
+//            );
+//        } catch (ParsingException e) {
+//            e.printStackTrace();
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
 
 //        CPP14Lexer lexer = new CPP14Lexer(CharStreams.fromString(cppCode));
 //        // create a buffer of tokens pulled from the lexer
@@ -211,6 +229,7 @@ public class BisonTokenListener extends BisonParserBaseListener {
 //            CPP14Parser.CompoundStatementContext block = parser.compoundStatement();
 //            ParseTreeWalker.DEFAULT.walk(new CPPTokenListener(new AdjustedCPPParserAdapter(line, col, this.parser)), block);
 //        }
+        new CPP14Scanner().scanIS(CharStreams.fromString(cppCode),new AdjustedTokenAdder(line,col));
     }
 
     private void addEnter(TokenType type, Token token) {
