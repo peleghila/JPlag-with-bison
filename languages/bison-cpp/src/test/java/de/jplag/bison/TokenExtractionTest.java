@@ -59,11 +59,25 @@ public class TokenExtractionTest {
             "        ;";
     @Test
     void testParseBison() throws IOException, ParsingException {
+        de.jplag.text.ParserAdapter textParser = new de.jplag.text.ParserAdapter();
         BisonParserAdapter parser = new BisonParserAdapter();
 
         File filePath = File.createTempFile("content","ypp");
         Files.writeString(filePath.toPath(), simple_bison);
+        List<Token> textTokensForPositions = textParser.parse(Set.of(filePath));
         List<Token> tokens = parser.scan(Set.of(filePath));
+        System.out.println(tokens);
+    }
+
+    @Test
+    void compareBisonToText() throws Exception {
+        de.jplag.text.ParserAdapter textParser = new de.jplag.text.ParserAdapter();
+        BisonParserAdapter parser = new BisonParserAdapter();
+
+        File filePath = new File("D:\\hw-examples\\200408698-311489793\\parser.ypp");
+        List<Token> textTokensForPositions = textParser.parse(Set.of(filePath));
+        List<Token> tokens = parser.scan(Set.of(filePath));
+
         System.out.println(tokens);
     }
 }

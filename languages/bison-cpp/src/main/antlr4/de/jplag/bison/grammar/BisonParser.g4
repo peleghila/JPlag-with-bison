@@ -239,7 +239,7 @@ rules
     ;
 
 rhses_1
-    : rhs ('|' rhs)* SEMICOLON
+    : rhs ('|' rhs)* SEMICOLON?
     ;
 
 rhs
