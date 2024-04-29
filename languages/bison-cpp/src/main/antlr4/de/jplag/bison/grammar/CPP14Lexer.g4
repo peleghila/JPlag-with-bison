@@ -1,9 +1,10 @@
 lexer grammar CPP14Lexer;
 
 @members {
-    boolean rawString = false;
-    String delim = "";
+    String rawStringDelim = null;
 }
+
+
 
 IntegerLiteral:
 	DecimalLiteral Integersuffix?
@@ -20,8 +21,7 @@ FloatingLiteral:
 
 StringLiteral:
 	Encodingprefix?
-    (Rawstring
-	|'"' Schar* '"');
+    ('"' Schar* '"' );
 
 BooleanLiteral: False_ | True_;
 
@@ -391,7 +391,7 @@ fragment Schar:
 	| Universalcharactername
 	| BadEscapeSequence;
 
-Rawstring: 'R"' (( '\\' ["()] )|~[\r\n (])*? '(' ~[)]*? ')'  (( '\\' ["()]) | ~[\r\n "])*? '"';
+Rawstring: 'R"' -> mode(RawString1); //(( '\\' ["()] )|~[\r\n (])*? '(' ~[)]*? ')'  (( '\\' ["()]) | ~[\r\n "])*? '"';
 
 UserDefinedIntegerLiteral:
 	DecimalLiteral Udsuffix
@@ -417,7 +417,31 @@ BlockComment: '/*'  -> mode(BlockCommentMode), skip;
 
 LineComment: '//' ~ [\r\n]* -> skip;
 
+fragment DChar: ('\n'|[!-']|[*-.]|'/'|[0-Z]|'['|']'|'^'|[_-z]|'{'|'}'|'~')*;
+
 mode BlockCommentMode;
 COMMENT_BODY1: ~'*' -> skip;
 COMMENT_BODY2: '*' {this._input.LA(1) != '/'}? -> skip;
 COMMENT_END: '*/' -> mode(DEFAULT_MODE),skip;
+
+mode RawString1;
+RawString1Rec: DChar '(' {getText().length() <= 17}? {rawStringDelim = getText().substring(0,getText().length() - 1);} -> mode(RawString2);
+
+mode RawString2;
+RawString2RecA: (~')')*;
+RawStringCloseParen: ')' -> mode(RawStringMayEnd);
+
+mode RawStringMayEnd;
+RawStringMayEndRec: DChar {getText().equals(rawStringDelim)}? -> mode(RawStringEndMode);
+RawStringDoesNotEndNow: . {rawStringDelim.length() > 0}? -> mode(RawString2);
+
+//RawString2End: ')' {java.util.stream.IntStream.range(0,rawStringDelim.length()).allMatch(
+//                     					i -> this._input.LA(i + 1) == rawStringDelim.charAt(i)
+//                     			) && this._input.LA(rawStringDelim.length() + 1) == '"'}? -> mode(RawString3);
+//RawString2RecB: ')' {!java.util.stream.IntStream.range(0,rawStringDelim.length()).allMatch(
+//  i -> this._input.LA(i + 1) == rawStringDelim.charAt(i)) ||
+//  this._input.LA(rawStringDelim.length() + 1) == '"'}?;
+
+mode RawStringEndMode;
+RawStingEnd: '"' {rawStringDelim = null;} -> mode(DEFAULT_MODE);
+RawStringNotEnd: ~'"' -> mode(RawString2);
