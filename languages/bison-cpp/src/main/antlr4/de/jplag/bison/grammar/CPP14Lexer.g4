@@ -411,8 +411,13 @@ fragment Udsuffix: Identifier;
 
 Whitespace: [ \t]+ -> skip;
 
-Newline: ('\r' '\n'? | '\n') -> skip;
+Newline: ('\r' '\n'? | '\n' | '\\\r' | '\\\n') -> skip;
 
-BlockComment: '/*' .*? '*/' -> skip;
+BlockComment: '/*'  -> mode(BlockCommentMode), skip;
 
 LineComment: '//' ~ [\r\n]* -> skip;
+
+mode BlockCommentMode;
+COMMENT_BODY1: ~'*' -> skip;
+COMMENT_BODY2: '*' {LA(1) != '/'}? -> skip;
+COMMENT_END: '*/' -> mode(DEFAULT_MODE),skip;
