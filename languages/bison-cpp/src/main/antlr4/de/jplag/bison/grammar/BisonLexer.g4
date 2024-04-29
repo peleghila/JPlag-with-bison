@@ -267,7 +267,7 @@ INT       : [0-9]+;
 LPAREN    : '(';
 RPAREN    : ')';
 
-BLOCK_COMMENT: BlockComment -> channel(HIDDEN);
+BLOCK_COMMENT: '/*'  -> mode(BlockCommentMode), channel(HIDDEN);
 
 LINE_COMMENT: LineComment -> channel(HIDDEN);
 
@@ -284,3 +284,8 @@ mode EpilogueMode;
 // Expected: Warning AC0131 greedy block ()+ contains wildcard; the non-greedy syntax ()+? may be preferred LanguageServer
 // Changing from .* to .*? to avoid the warning. It may or may not work.
 EPILOGUE: .+;
+
+mode BlockCommentMode;
+COMMENT_BODY1: (~'*') -> channel(HIDDEN);
+COMMENT_BODY2: '*' {this._input.LA(1) != '/'}? -> channel(HIDDEN);
+COMMENT_END: '*/' -> mode(DEFAULT_MODE),channel(HIDDEN);
