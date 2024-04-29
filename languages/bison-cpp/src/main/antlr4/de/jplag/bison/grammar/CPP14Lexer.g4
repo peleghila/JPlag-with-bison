@@ -419,5 +419,5 @@ LineComment: '//' ~ [\r\n]* -> skip;
 
 mode BlockCommentMode;
 COMMENT_BODY1: ~'*' -> skip;
-COMMENT_BODY2: '*' {LA(1) != '/'}? -> skip;
+COMMENT_BODY2: '*' {this._input.LA(1) != '/'}? -> skip;
 COMMENT_END: '*/' -> mode(DEFAULT_MODE),skip;
