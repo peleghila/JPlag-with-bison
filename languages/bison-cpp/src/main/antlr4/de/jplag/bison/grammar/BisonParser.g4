@@ -232,6 +232,7 @@ bison_grammar
 rules_or_grammar_declaration
     : rules
     | grammar_declaration SEMICOLON
+    | SEMICOLON
     ;
 
 rules
