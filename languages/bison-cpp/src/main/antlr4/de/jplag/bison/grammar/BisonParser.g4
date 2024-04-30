@@ -239,7 +239,7 @@ rules
     ;
 
 rhses_1
-    : rhs ('|' rhs)* SEMICOLON?
+    : rhs ('|' rhs)*
     ;
 
 rhs
@@ -253,7 +253,7 @@ rhs
         | MERGE TAG
         | EXPECT INT
         | EXPECT_RR INT
-    )*
+    )* SEMICOLON?
     ;
 
 named_ref_opt
