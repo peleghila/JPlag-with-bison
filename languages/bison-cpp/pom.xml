@@ -15,11 +15,6 @@
         </dependency>
         <dependency>
             <groupId>de.jplag</groupId>
-            <artifactId>cpp2</artifactId>
-            <version>4.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>de.jplag</groupId>
             <artifactId>text</artifactId>
             <version>4.3.0</version>
             <scope>test</scope>
