@@ -3,7 +3,7 @@ package de.jplag.bison;
 import de.jplag.ParsingException;
 import de.jplag.Token;
 import de.jplag.TokenType;
-import de.jplag.cpp2.grammar.CPP14Lexer;
+import de.jplag.bison.grammar.CPP14Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;

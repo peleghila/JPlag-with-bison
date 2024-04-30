@@ -3,7 +3,7 @@ package de.jplag.bison;
 import de.jplag.Language;
 import de.jplag.ParsingException;
 import de.jplag.Token;
-import de.jplag.cpp2.CPPParserAdapter;
+//import de.jplag.cpp2.CPPParserAdapter;
 //import de.jplag.cpp.Scanner;
 import org.kohsuke.MetaInfServices;
 
