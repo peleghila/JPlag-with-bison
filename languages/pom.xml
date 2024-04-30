@@ -9,6 +9,7 @@
     <artifactId>languages</artifactId>
     <packaging>pom</packaging>
     <modules>
+        <module>bison-cpp</module>
         <module>cpp</module>
         <module>cpp2</module>
         <module>csharp</module>
