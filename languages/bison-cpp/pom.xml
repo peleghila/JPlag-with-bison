@@ -13,12 +13,6 @@
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
         </dependency>
-        <dependency>
-            <groupId>de.jplag</groupId>
-            <artifactId>text</artifactId>
-            <version>4.3.0</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
