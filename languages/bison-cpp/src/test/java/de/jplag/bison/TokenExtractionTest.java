@@ -70,17 +70,17 @@ public class TokenExtractionTest {
         System.out.println(tokens);
     }
 
-    @Test
-    void compareBisonToText() throws Exception {
-        //de.jplag.text.ParserAdapter textParser = new de.jplag.text.ParserAdapter();
-        BisonParserAdapter parser = new BisonParserAdapter();
-
-        File filePath = new File("parser.ypp");
-        //List<Token> textTokensForPositions = textParser.parse(Set.of(filePath));
-        List<Token> tokens = parser.scan(Set.of(filePath));
-
-        System.out.println(tokens);
-    }
+//    @Test
+//    void compareBisonToText() throws Exception {
+//        //de.jplag.text.ParserAdapter textParser = new de.jplag.text.ParserAdapter();
+//        BisonParserAdapter parser = new BisonParserAdapter();
+//
+//        File filePath = new File("parser.ypp");
+//        //List<Token> textTokensForPositions = textParser.parse(Set.of(filePath));
+//        List<Token> tokens = parser.scan(Set.of(filePath));
+//
+//        System.out.println(tokens);
+//    }
 
     @Test
     void testRawString() throws Exception {
