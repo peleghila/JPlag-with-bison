@@ -24,6 +24,11 @@
         </dependency>
         <dependency>
             <groupId>de.jplag</groupId>
+            <artifactId>bison-cpp</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.jplag</groupId>
             <artifactId>text</artifactId>
             <version>${revision}</version>
         </dependency>
